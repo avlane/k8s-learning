@@ -1,0 +1,9 @@
+.DS_Store
+*.swp
+.idea/
+.vscode/
+__pycache__/
+# local cluster config and anything that looks like a real secret
+kubeconfig*
+.kube/
+*.secret.yaml
