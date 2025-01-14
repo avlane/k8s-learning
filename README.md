@@ -6,4 +6,4 @@ list of mistakes I expect to make with the fix.
 
 ## Lessons
 
-(none yet)
+- [00-setup](00-setup/README.md): cluster options and kubectl basics
