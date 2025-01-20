@@ -7,3 +7,5 @@ list of mistakes I expect to make with the fix.
 ## Lessons
 
 - [00-setup](00-setup/README.md): cluster options and kubectl basics
+
+- [01-pods](01-pods/README.md): a single Pod, logs, exec, port-forward
