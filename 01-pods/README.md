@@ -4,7 +4,7 @@ A Pod is one or more containers that share a network namespace and volumes. You
 rarely create bare Pods in real life (a Deployment does it for you), but they are
 the smallest unit to learn on.
 
-Files: `pod.yaml`
+Files: `pod.yaml`, `toolbox.yaml` (a busybox Pod to run commands from inside the cluster)
 
 ## Run it
 
@@ -38,3 +38,11 @@ Expected:
 - No resource requests or limits.
 - No `securityContext`, so nginx runs as root.
 - It lives in the `default` namespace.
+
+## Talking to the Pod from another Pod
+
+    kubectl apply -f toolbox.yaml
+    kubectl get pod hello-nginx -o wide                      # note the IP column
+    kubectl exec toolbox -- wget -qO- http://POD_IP          # busybox has wget, not curl
+
+Pod IPs change every time a Pod is recreated, which is why Services exist (lesson 03).

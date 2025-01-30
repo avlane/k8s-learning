@@ -4,6 +4,8 @@ metadata:
   name: hello-nginx
   labels:
     app: hello
+    app.kubernetes.io/name: hello-nginx
+    app.kubernetes.io/part-of: k8s-learning
 spec:
   containers:
     - name: nginx
