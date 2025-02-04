@@ -46,3 +46,23 @@ Expected:
     kubectl exec toolbox -- wget -qO- http://POD_IP          # busybox has wget, not curl
 
 Pod IPs change every time a Pod is recreated, which is why Services exist (lesson 03).
+
+## Mistakes and fixes
+
+### ImagePullBackOff / ErrImagePull
+
+`broken/imagepull-typo.yaml` asks for a tag that does not exist.
+
+    kubectl apply -f broken/imagepull-typo.yaml
+    kubectl get pods --watch
+
+Expected: STATUS goes `ErrImagePull`, then `ImagePullBackOff`, with
+growing delays between retries. `kubectl describe pod imagepull-typo` should show
+a `Failed to pull image` event saying the manifest for `nginx:1.27.33` was not found.
+
+Common causes: typo in the name or tag, private registry without an
+`imagePullSecret`, or no network access from the node.
+
+Fix: correct the tag (or add the pull secret) and re-apply. For a bare Pod most
+fields are immutable, so `kubectl delete pod` and apply again. The image field is one
+of the few you can change in place with `kubectl set image` or `kubectl edit`.

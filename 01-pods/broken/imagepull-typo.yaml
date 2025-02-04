@@ -1,0 +1,9 @@
+# Deliberately broken: the tag does not exist.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: imagepull-typo
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.27.33
