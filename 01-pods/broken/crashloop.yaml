@@ -1,0 +1,10 @@
+# Deliberately broken: the process exits with an error straight away.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: crashloop
+spec:
+  containers:
+    - name: app
+      image: busybox:1.37.0
+      command: ["sh", "-c", "echo starting; echo 'config file missing' >&2; exit 1"]

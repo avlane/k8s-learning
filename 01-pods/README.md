@@ -66,3 +66,22 @@ Common causes: typo in the name or tag, private registry without an
 Fix: correct the tag (or add the pull secret) and re-apply. For a bare Pod most
 fields are immutable, so `kubectl delete pod` and apply again. The image field is one
 of the few you can change in place with `kubectl set image` or `kubectl edit`.
+### CrashLoopBackOff
+
+`broken/crashloop.yaml` prints an error and exits with status 1. The default
+`restartPolicy` of a Pod is `Always`, so the kubelet restarts it, with an
+exponential back-off (10s, 20s, 40s ... up to 5 minutes).
+
+    kubectl apply -f broken/crashloop.yaml
+    kubectl get pod crashloop --watch
+    kubectl logs crashloop --previous
+    kubectl describe pod crashloop
+
+Expected: RESTARTS climbs, STATUS alternates between `Error` and
+`CrashLoopBackOff`. `logs --previous` shows the output of the last crashed run
+(`starting` and `config file missing`). `describe` shows `Last State: Terminated`
+with `Exit Code: 1`.
+
+Reading the exit code: 1 is the app's own failure, 137 is SIGKILL (often OOM, see
+lesson 05), 143 is SIGTERM, 126/127 is a command that could not run or was not found.
+CrashLoopBackOff is a symptom, not a cause. The cause is in `logs --previous` or the exit code.
