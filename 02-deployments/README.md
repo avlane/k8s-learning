@@ -34,3 +34,24 @@ Expected:
 
 - No resource requests or limits, no probes, no securityContext.
 - The image tag is pinned but is bumped by hand.
+
+## Mistakes and fixes
+
+### Selector does not match the template labels
+
+`broken/selector-mismatch.yaml` selects `app=web` but labels its Pods `app=webapp`.
+
+    kubectl apply -f broken/selector-mismatch.yaml
+
+Expected: in `apps/v1` the API server rejects this at apply time
+with an error along the lines of `spec.template.metadata.labels: Invalid value ...:
+selector does not match template labels`. In the old `extensions/v1beta1` and
+`apps/v1beta1` days a mismatch was accepted and produced a Deployment that never
+owned its Pods, which is a good reason to stay on `apps/v1`.
+
+Related mistakes:
+
+- `spec.selector` is immutable after creation. Changing the labels of a running
+  Deployment means deleting and recreating it.
+- Two Deployments with overlapping selectors fight over the same Pods. Keep a unique label such as `app.kubernetes.io/instance`.
+- A **Service** with a selector that matches nothing is not rejected. It just has no endpoints (lesson 03).
