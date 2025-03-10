@@ -55,3 +55,17 @@ Related mistakes:
   Deployment means deleting and recreating it.
 - Two Deployments with overlapping selectors fight over the same Pods. Keep a unique label such as `app.kubernetes.io/instance`.
 - A **Service** with a selector that matches nothing is not rejected. It just has no endpoints (lesson 03).
+
+## Rolling update settings
+
+`maxSurge: 1, maxUnavailable: 0` means: start one extra Pod first, wait until it is
+Ready (plus `minReadySeconds`), then remove an old one. Capacity never drops
+below the desired replica count. The defaults are 25% for both, which rounds
+`maxSurge` up and `maxUnavailable` down.
+
+Without a readiness probe a Pod counts as Ready as soon as its container starts,
+so a rollout can "succeed" while the new version is still booting. That is the
+motivation for lesson 05.
+
+`revisionHistoryLimit: 5` keeps five old ReplicaSets for `rollout undo`. The
+default is 10, which clutters `kubectl get rs`.
