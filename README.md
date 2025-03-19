@@ -11,3 +11,5 @@ list of mistakes I expect to make with the fix.
 - [01-pods](01-pods/README.md): a single Pod, logs, exec, port-forward
 
 - [02-deployments](02-deployments/README.md): Deployments, ReplicaSets, rollouts
+
+- [03-services](03-services/README.md): ClusterIP, NodePort, headless Services and DNS
