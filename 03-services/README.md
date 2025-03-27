@@ -26,3 +26,12 @@ Expected:
 - The EndpointSlice should list the three Pod IPs.
 - Inside the cluster `web` resolves from the same namespace, and `web.default.svc.cluster.local` resolves from anywhere.
 - `port` is what clients use on the Service, `targetPort` is the port the container listens on.
+
+## Other Service types
+
+- `service-nodeport.yaml`: also opens port 30080 (the NodePort range is 30000-32767 by default) on every node. With kind the node is a container, so reaching it from the host needs `extraPortMappings` in the kind config. `port-forward` is easier.
+- `service-headless.yaml`: `clusterIP: None` gives no virtual IP. DNS returns the Pod IPs directly (one A record per ready Pod). StatefulSets use this for stable per-Pod names (lesson 06).
+- `type: LoadBalancer` needs a cloud provider or something like MetalLB. On a local cluster the EXTERNAL-IP stays `<pending>`.
+
+Expected: `nslookup web-headless` from the toolbox returns three addresses,
+while `nslookup web` returns the single ClusterIP.
