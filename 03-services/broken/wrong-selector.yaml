@@ -1,0 +1,11 @@
+# Deliberately broken: no Pod has the label app=webb.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-wrong-selector
+spec:
+  selector:
+    app: webb
+  ports:
+    - port: 80
+      targetPort: 80

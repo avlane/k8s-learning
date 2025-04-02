@@ -35,3 +35,30 @@ Expected:
 
 Expected: `nslookup web-headless` from the toolbox returns three addresses,
 while `nslookup web` returns the single ClusterIP.
+
+## Mistakes and fixes
+
+### Selector matches nothing
+
+`broken/wrong-selector.yaml`: the Service is created without complaint, but
+
+    kubectl get endpointslices -l kubernetes.io/service-name=web-wrong-selector
+    kubectl describe service web-wrong-selector
+
+Expected: the EndpointSlice has no endpoints and `describe` shows
+`Endpoints: <none>`. Requests to the Service hang or are refused. Compare the
+Service selector with `kubectl get pods --show-labels`. This is the most common Service bug.
+
+### Right Pods, wrong targetPort
+
+`broken/wrong-targetport.yaml`: endpoints exist (the Pods match) but they point at port 8080.
+
+Expected: `kubectl get endpointslices` lists the Pod IPs with port 8080,
+and `wget http://web-wrong-port` fails with "connection refused", since nothing listens on 8080.
+Fix `targetPort` to the container's real port, or give the container port a name and
+use the name in `targetPort` so that only the Pod spec needs to change.
+
+### A Pod that is not Ready is not an endpoint
+
+If the readiness probe fails (lesson 05) the Pod is removed from the EndpointSlice
+but keeps running. A Service with zero ready Pods behaves like the no-selector case.
