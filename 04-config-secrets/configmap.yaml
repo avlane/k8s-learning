@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_MODE: demo
+  LOG_LEVEL: info
+  index.html: |
+    <!doctype html>
+    <title>config demo</title>
+    <p>served from a ConfigMap</p>

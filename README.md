@@ -13,3 +13,5 @@ list of mistakes I expect to make with the fix.
 - [02-deployments](02-deployments/README.md): Deployments, ReplicaSets, rollouts
 
 - [03-services](03-services/README.md): ClusterIP, NodePort, headless Services and DNS
+
+- [04-config-secrets](04-config-secrets/README.md): ConfigMaps, Secrets, env vars vs files
