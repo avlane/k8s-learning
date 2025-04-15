@@ -26,3 +26,19 @@ and nginx serves the page from the ConfigMap.
 - A volume-mounted ConfigMap is refreshed by the kubelet after a delay (up to about a minute),
   **except** when mounted with `subPath`, which never updates. This example uses
   `subPath` on purpose so you can see that.
+
+## Secrets
+
+    kubectl apply -f secret.yaml
+    kubectl apply -f pod-secret.yaml
+    kubectl get secret db-credentials -o yaml
+    kubectl get secret db-credentials -o jsonpath='{.data.DB_PASSWORD}' | base64 -d
+    kubectl exec secret-demo -- env | grep DB_
+
+Expected: the YAML shows the values base64-encoded under `data:`
+(`stringData` is write-only convenience and is converted on the way in).
+
+**base64 is encoding, not encryption.** Anyone who can read the Secret can decode it,
+and by default Secrets are stored unencrypted in etcd unless encryption at rest is
+configured. The password in `secret.yaml` is a placeholder, but committing a real
+one would be a leak. See the mistakes below.
