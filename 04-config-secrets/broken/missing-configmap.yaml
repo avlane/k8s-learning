@@ -1,0 +1,13 @@
+# Deliberately broken: refers to a ConfigMap that does not exist.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: missing-config
+spec:
+  containers:
+    - name: busybox
+      image: busybox:1.37.0
+      command: ["sleep", "3600"]
+      envFrom:
+        - configMapRef:
+            name: does-not-exist

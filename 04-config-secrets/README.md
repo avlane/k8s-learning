@@ -42,3 +42,32 @@ Expected: the YAML shows the values base64-encoded under `data:`
 and by default Secrets are stored unencrypted in etcd unless encryption at rest is
 configured. The password in `secret.yaml` is a placeholder, but committing a real
 one would be a leak. See the mistakes below.
+
+## Mistakes and fixes
+
+### CreateContainerConfigError
+
+`broken/missing-configmap.yaml` refers to a ConfigMap that is not there.
+
+    kubectl apply -f broken/missing-configmap.yaml
+    kubectl get pod missing-config
+    kubectl describe pod missing-config
+
+Expected: STATUS `CreateContainerConfigError`; the event says
+`configmap "does-not-exist" not found`. The container is never started, so there are
+no logs. Create the ConfigMap and the kubelet retries on its own. Add
+`optional: true` to the reference if the config really is optional.
+
+The same happens with a `secretKeyRef` to a missing Secret or key.
+
+### Config changed but the app did not notice
+
+Env vars are fixed at start (restart with `kubectl rollout restart deployment/NAME`).
+Files mounted with `subPath` never update. Many apps only read config at startup anyway.
+
+### Immutable ConfigMaps and Secrets
+
+Setting `immutable: true` stops edits (and saves the kubelet from watching them).
+To change one you create a new object with a new name and point the workload at it.
+Appending a short content hash to the name is the usual pattern, and is what
+Kustomize's `configMapGenerator` does (lesson 11).
