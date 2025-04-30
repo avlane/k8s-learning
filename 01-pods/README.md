@@ -85,3 +85,19 @@ with `Exit Code: 1`.
 Reading the exit code: 1 is the app's own failure, 137 is SIGKILL (often OOM, see
 lesson 05), 143 is SIGTERM, 126/127 is a command that could not run or was not found.
 CrashLoopBackOff is a symptom, not a cause. The cause is in `logs --previous` or the exit code.
+
+## Sidecar containers
+
+`sidecar-pod.yaml` uses a native sidecar: an entry in `initContainers` with
+`restartPolicy: Always`. Before this feature, sidecars were just extra entries in
+`containers`, which made startup order and Job completion awkward (a Job with a
+log-shipper container never finished).
+
+Native sidecars reached GA in Kubernetes 1.33 and were beta (on by default) from 1.29, so this needs a
+reasonably recent cluster.
+
+    kubectl apply -f sidecar-pod.yaml
+    kubectl logs sidecar-demo -c log-tailer --follow
+
+Expected: `kubectl get pod sidecar-demo` shows `2/2` once both are running,
+and the log-tailer prints a timestamp every five seconds.
