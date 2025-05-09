@@ -15,3 +15,5 @@ list of mistakes I expect to make with the fix.
 - [03-services](03-services/README.md): ClusterIP, NodePort, headless Services and DNS
 
 - [04-config-secrets](04-config-secrets/README.md): ConfigMaps, Secrets, env vars vs files
+
+- [05-probes-resources](05-probes-resources/README.md): probes, requests and limits, QoS
