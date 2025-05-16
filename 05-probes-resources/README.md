@@ -26,4 +26,20 @@ Expected: the Pods become Ready after a few seconds, then
 `Container nginx failed liveness probe, will be restarted`.
 
 The stock nginx image has no `/healthz` route, so the liveness probe gets a 404 and 4xx is a failure.
-(Any status from 200 to 399 passes.) This manifest has that bug in on purpose; the fix is in the next commit.
+(Any status from 200 to 399 passes.) The first version of this manifest had that bug. The liveness path is now `/`.
+
+## Requests and limits
+
+- **requests** are what the scheduler reserves when placing the Pod. A Pod whose requests do not fit on any node stays `Pending`.
+- **limits** are enforced at runtime. Over the CPU limit the container is throttled. Over the memory limit it is killed (`OOMKilled`, exit code 137).
+- `50m` is 50 millicores (5% of a core). `64Mi` is mebibytes (`64M` would be megabytes, a small but real difference).
+
+QoS class, shown in `kubectl describe pod`:
+
+| class | when |
+|---|---|
+| Guaranteed | every container has requests equal to limits for both CPU and memory |
+| Burstable | at least one request or limit is set, but not Guaranteed |
+| BestEffort | nothing set; first to be evicted under node pressure |
+
+The Deployment here is Burstable.
