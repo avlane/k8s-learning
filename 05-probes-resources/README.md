@@ -43,3 +43,33 @@ QoS class, shown in `kubectl describe pod`:
 | BestEffort | nothing set; first to be evicted under node pressure |
 
 The Deployment here is Burstable.
+
+## startupProbe
+
+The startup probe (up to 15 failures x 2s = 30s here) gives a slow app time to boot without
+loosening the liveness probe. While it has not succeeded, liveness and readiness are not run.
+
+## Mistakes and fixes
+
+### OOMKilled
+
+    kubectl apply -f broken/oomkilled.yaml
+    kubectl get pod oomkilled
+    kubectl describe pod oomkilled
+
+Expected: STATUS `OOMKilled` (or `Error`), and under `Last State`
+(or `State`) `Terminated`, `Reason: OOMKilled`, `Exit Code: 137`. With the default
+`restartPolicy: Always` it would instead loop in CrashLoopBackOff.
+Fix: raise the limit if the app really needs it, or fix the leak. Memory limits
+are hard, so size them from measurements (`kubectl top pod`, needs metrics-server).
+
+### Liveness probe too aggressive
+
+A liveness probe that depends on a slow dependency (a database) can restart
+healthy containers during an outage and make it worse. Keep liveness cheap and local,
+and put dependency checks in readiness if anywhere.
+
+### Probe port or path wrong
+
+See the bug in the first version of `deployment-probes.yaml` above. A failing readiness
+probe shows up as `0/1 READY` with a Running status, and no endpoints for the Service.

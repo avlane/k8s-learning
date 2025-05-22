@@ -1,0 +1,17 @@
+# Deliberately broken: tail /dev/zero buffers an endless line in memory and
+# blows through the 32Mi limit.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: oomkilled
+spec:
+  restartPolicy: Never
+  containers:
+    - name: hog
+      image: busybox:1.37.0
+      command: ["sh", "-c", "tail /dev/zero"]
+      resources:
+        requests:
+          memory: 16Mi
+        limits:
+          memory: 32Mi
