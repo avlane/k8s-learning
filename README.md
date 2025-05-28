@@ -17,3 +17,5 @@ list of mistakes I expect to make with the fix.
 - [04-config-secrets](04-config-secrets/README.md): ConfigMaps, Secrets, env vars vs files
 
 - [05-probes-resources](05-probes-resources/README.md): probes, requests and limits, QoS
+
+- [06-storage](06-storage/README.md): emptyDir, PVCs, StatefulSets
