@@ -1,0 +1,12 @@
+# Deliberately broken: asks for a StorageClass that does not exist.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-no-class
+spec:
+  storageClassName: fast-ssd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

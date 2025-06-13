@@ -42,3 +42,36 @@ Expected:
     kubectl get pvc
     kubectl delete pod store-0
     kubectl exec store-0 -- cat /data/hosts      # should show store-0 twice after the restart
+
+## Mistakes and fixes
+
+### PVC stuck in Pending
+
+`broken/pvc-no-class.yaml` names a StorageClass (`fast-ssd`) the cluster does not have.
+
+    kubectl apply -f broken/pvc-no-class.yaml
+    kubectl get pvc pvc-no-class
+    kubectl describe pvc pvc-no-class
+
+Expected: STATUS stays `Pending`; the event says `storageclass.storage.k8s.io "fast-ssd" not found`.
+Other reasons for Pending: no default StorageClass at all, or a class with
+`volumeBindingMode: WaitForFirstConsumer`, where the PVC stays Pending **on purpose**
+until a Pod that uses it is scheduled. A Pod that references a Pending PVC is itself
+`Pending` with `unbound immediate PersistentVolumeClaims`.
+
+### Data deleted when you did not expect it
+
+The `reclaimPolicy` of the StorageClass decides what happens to the PV when the PVC goes away.
+Dynamically provisioned volumes usually default to `Delete`. For anything you care about
+use `Retain` (set on the StorageClass, or patch the PV).
+
+### PVCs left behind by a StatefulSet
+
+Deleting a StatefulSet or scaling it down does not delete its PVCs by default, which protects data
+but also leaks storage. `persistentVolumeClaimRetentionPolicy` (`whenDeleted` / `whenScaled`:
+`Retain` or `Delete`) controls this. Clean up manually with `kubectl delete pvc -l app=store`.
+
+### Volume permissions
+
+A non-root container may not be able to write to a freshly provisioned volume owned by root.
+`securityContext.fsGroup` on the Pod makes the kubelet adjust group ownership. This matters a lot for databases.
