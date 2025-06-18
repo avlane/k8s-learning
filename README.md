@@ -19,3 +19,5 @@ list of mistakes I expect to make with the fix.
 - [05-probes-resources](05-probes-resources/README.md): probes, requests and limits, QoS
 
 - [06-storage](06-storage/README.md): emptyDir, PVCs, StatefulSets
+
+- [07-ingress-gateway](07-ingress-gateway/README.md): Ingress, then the Gateway API
