@@ -1,0 +1,15 @@
+# gatewayClassName must name a GatewayClass that an installed implementation provides.
+# "example-gateway-class" is a placeholder; see `kubectl get gatewayclass`.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: web-gateway
+spec:
+  gatewayClassName: example-gateway-class
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
