@@ -47,3 +47,15 @@ It is not built into Kubernetes: the CRDs are installed separately, and so is an
 
 Expected: the Gateway reports `Programmed: True` and an address, and the
 HTTPRoute reports `Accepted: True` and `ResolvedRefs: True` for its parent.
+
+## Mistakes and fixes
+
+- **Missing `pathType`**: `broken/ingress-no-pathtype.yaml` should be rejected on apply with a
+  `pathType: Required value` style error. The old `v1beta1` API allowed it. Use `Prefix` (match path segments),
+  `Exact`, or `ImplementationSpecific`.
+- **No `ingressClassName`** (and no default IngressClass): the Ingress is accepted and then ignored by every controller.
+  `kubectl get ingressclass` shows what exists. The old `kubernetes.io/ingress.class` annotation is deprecated.
+- **Backend port wrong**: the Ingress points at the Service `port` (or its name), not the `targetPort`. A wrong number
+  gives `503` from the controller and a warning in `kubectl describe ingress`.
+- **Testing by IP**: with host-based rules, `curl http://localhost/` without the Host header hits the default backend (404).
+- **Annotations are controller specific**: `nginx.ingress.kubernetes.io/rewrite-target` means nothing to another controller.
