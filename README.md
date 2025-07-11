@@ -21,3 +21,5 @@ list of mistakes I expect to make with the fix.
 - [06-storage](06-storage/README.md): emptyDir, PVCs, StatefulSets
 
 - [07-ingress-gateway](07-ingress-gateway/README.md): Ingress, then the Gateway API
+
+- [08-rbac](08-rbac/README.md): ServiceAccounts, Roles, RoleBindings, `auth can-i`
