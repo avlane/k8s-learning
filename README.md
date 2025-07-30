@@ -23,3 +23,5 @@ list of mistakes I expect to make with the fix.
 - [07-ingress-gateway](07-ingress-gateway/README.md): Ingress, then the Gateway API
 
 - [08-rbac](08-rbac/README.md): ServiceAccounts, Roles, RoleBindings, `auth can-i`
+
+- [09-network-policies](09-network-policies/README.md): default deny and allow rules
