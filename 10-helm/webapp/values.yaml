@@ -1,0 +1,16 @@
+replicaCount: 2
+
+image:
+  repository: nginx
+  # empty means: use the chart's appVersion
+  tag: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+
+nameOverride: ""
+fullnameOverride: ""

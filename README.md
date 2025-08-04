@@ -25,3 +25,5 @@ list of mistakes I expect to make with the fix.
 - [08-rbac](08-rbac/README.md): ServiceAccounts, Roles, RoleBindings, `auth can-i`
 
 - [09-network-policies](09-network-policies/README.md): default deny and allow rules
+
+- [10-helm](10-helm/README.md): a hand-written chart, values, releases

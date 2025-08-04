@@ -1,0 +1,4 @@
+The {{ include "webapp.fullname" . }} release is installed.
+
+  kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+  kubectl port-forward service/{{ include "webapp.fullname" . }} 8080:{{ .Values.service.port }}
