@@ -27,3 +27,5 @@ list of mistakes I expect to make with the fix.
 - [09-network-policies](09-network-policies/README.md): default deny and allow rules
 
 - [10-helm](10-helm/README.md): a hand-written chart, values, releases
+
+- [11-kustomize](11-kustomize/README.md): base and overlays, `kubectl kustomize`
