@@ -9,3 +9,9 @@ replicas:
 images:
   - name: nginx
     newTag: 1.27.5
+patches:
+  - path: resources-patch.yaml
+configMapGenerator:
+  - name: web-config
+    literals:
+      - APP_MODE=production
