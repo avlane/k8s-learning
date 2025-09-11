@@ -29,3 +29,5 @@ list of mistakes I expect to make with the fix.
 - [10-helm](10-helm/README.md): a hand-written chart, values, releases
 
 - [11-kustomize](11-kustomize/README.md): base and overlays, `kubectl kustomize`
+
+- [12-jobs-cronjobs](12-jobs-cronjobs/README.md): Jobs, CronJobs, retries and cleanup
