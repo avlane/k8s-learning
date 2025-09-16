@@ -1,0 +1,13 @@
+# Deliberately broken: a Job's Pods must use Never or OnFailure.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: restart-always
+spec:
+  template:
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: worker
+          image: busybox:1.37.0
+          command: ["true"]

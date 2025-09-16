@@ -25,3 +25,23 @@ The CronJob has no jobs until the next five-minute mark; `LAST SCHEDULE` shows w
 
 - The CronJob has no `concurrencyPolicy`, so a slow run overlaps the next one.
 - Finished Jobs and Pods pile up (the CronJob keeps 3 successful and 1 failed Jobs by default, a plain Job keeps itself forever).
+
+## Mistakes and fixes
+
+### restartPolicy: Always
+
+`broken/job-restart-always.yaml` should be rejected on apply: `Unsupported value: "Always": supported values: "OnFailure", "Never"`.
+`Never` makes a failed Pod stay around and the Job creates a *new* Pod for each retry. `OnFailure` restarts the container in the same Pod.
+
+### Retries
+
+`broken/job-fails.yaml` exits with status 3. Expected: `backoffLimit: 2` leads to about three Pods in
+`Error`, with growing delays, and the Job ends with condition `Failed` and reason `BackoffLimitExceeded`.
+
+### Overlapping and piling up (the CronJob fixes)
+
+- `concurrencyPolicy: Forbid` skips a run if the previous one is still going (`Allow` is the default, `Replace` kills the old one).
+- `startingDeadlineSeconds` gives up on a run that could not start in time (for example the controller was down). If more than 100 runs are missed the CronJob stops scheduling; a deadline limits what counts.
+- `activeDeadlineSeconds` kills a Job that runs too long; `backoffLimit` caps retries.
+- `ttlSecondsAfterFinished` deletes finished Jobs (and their Pods) automatically.
+- The schedule is evaluated in the controller's time zone (usually UTC) unless `timeZone` is set.

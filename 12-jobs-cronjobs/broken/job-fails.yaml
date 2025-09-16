@@ -1,0 +1,14 @@
+# Deliberately broken: always fails, so the Job retries and finally gives up.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: always-fails
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: worker
+          image: busybox:1.37.0
+          command: ["sh", "-c", "echo failing; exit 3"]

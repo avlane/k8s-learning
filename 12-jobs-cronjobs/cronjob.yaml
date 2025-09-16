@@ -4,8 +4,15 @@ metadata:
   name: heartbeat
 spec:
   schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 60
+      ttlSecondsAfterFinished: 3600
       template:
         spec:
           restartPolicy: OnFailure
