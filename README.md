@@ -31,3 +31,5 @@ list of mistakes I expect to make with the fix.
 - [11-kustomize](11-kustomize/README.md): base and overlays, `kubectl kustomize`
 
 - [12-jobs-cronjobs](12-jobs-cronjobs/README.md): Jobs, CronJobs, retries and cleanup
+
+- [13-autoscaling](13-autoscaling/README.md): metrics-server and the HorizontalPodAutoscaler

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-hpa
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web-hpa
+  template:
+    metadata:
+      labels:
+        app: web-hpa
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27.4
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-hpa
+spec:
+  selector:
+    app: web-hpa
+  ports:
+    - port: 80
+      targetPort: 80
