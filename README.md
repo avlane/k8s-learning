@@ -33,3 +33,5 @@ list of mistakes I expect to make with the fix.
 - [12-jobs-cronjobs](12-jobs-cronjobs/README.md): Jobs, CronJobs, retries and cleanup
 
 - [13-autoscaling](13-autoscaling/README.md): metrics-server and the HorizontalPodAutoscaler
+
+- [14-troubleshooting](14-troubleshooting/README.md): symptom table and broken scenarios
