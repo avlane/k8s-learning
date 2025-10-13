@@ -44,3 +44,17 @@ connection usually means `targetPort` is wrong.
 - Check `kubectl config current-context` before deleting anything.
 
 The `scenarios/` folder has manifests that fail on purpose, one per symptom in the table. Next commit.
+
+## Scenarios (expected symptoms)
+
+| file | expected status | where to see why |
+|---|---|---|
+| `pending-too-big.yaml` | `Pending` | `describe`: `0/2 nodes are available: ... Insufficient cpu` |
+| `node-selector.yaml` | `Pending` | `describe`: `node(s) didn't match Pod's node affinity/selector` |
+| `bad-configmap-key.yaml` | `CreateContainerConfigError` | `describe`: `couldn't find key absent in ConfigMap default/scenario-config` |
+| `readiness-never.yaml` | `Running`, `0/1` | `describe`: `Readiness probe failed: HTTP probe failed with statuscode: 404` |
+| `wrong-command.yaml` | `StartError` / `RunContainerError` | `describe`: `exec: "/usr/bin/does-not-exist": no such file or directory` |
+
+Lessons 01 to 06 have more (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Pending PVC).
+Apply one at a time with `kubectl apply -f scenarios/NAME.yaml`, work out the cause from
+`describe` and `logs` alone, then clean up with `kubectl delete -f`.

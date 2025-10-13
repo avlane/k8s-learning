@@ -1,0 +1,14 @@
+# Symptom: Pending. Requests more CPU and memory than any node has.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: too-big
+spec:
+  containers:
+    - name: busybox
+      image: busybox:1.37.0
+      command: ["sleep", "3600"]
+      resources:
+        requests:
+          cpu: "64"
+          memory: 512Gi

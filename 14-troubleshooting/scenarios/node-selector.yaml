@@ -1,0 +1,12 @@
+# Symptom: Pending. No node has the label disktype=ssd.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: needs-ssd
+spec:
+  nodeSelector:
+    disktype: ssd
+  containers:
+    - name: busybox
+      image: busybox:1.37.0
+      command: ["sleep", "3600"]

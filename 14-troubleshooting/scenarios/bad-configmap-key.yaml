@@ -1,0 +1,23 @@
+# Symptom: CreateContainerConfigError. The ConfigMap exists but the key does not.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scenario-config
+data:
+  present: "yes"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-key
+spec:
+  containers:
+    - name: busybox
+      image: busybox:1.37.0
+      command: ["sleep", "3600"]
+      env:
+        - name: SETTING
+          valueFrom:
+            configMapKeyRef:
+              name: scenario-config
+              key: absent

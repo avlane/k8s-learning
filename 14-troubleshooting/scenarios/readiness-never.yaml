@@ -1,0 +1,16 @@
+# Symptom: Running, READY 0/1, Service has no endpoints. The probe path does not exist.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: never-ready
+  labels:
+    app: never-ready
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.27.4
+      readinessProbe:
+        httpGet:
+          path: /ready
+          port: 80
+        periodSeconds: 5

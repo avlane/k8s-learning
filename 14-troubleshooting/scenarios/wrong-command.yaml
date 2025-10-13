@@ -1,0 +1,11 @@
+# Symptom: RunContainerError / StartError. The binary is not in the image.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wrong-command
+spec:
+  restartPolicy: Never
+  containers:
+    - name: busybox
+      image: busybox:1.37.0
+      command: ["/usr/bin/does-not-exist"]
