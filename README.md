@@ -35,3 +35,9 @@ list of mistakes I expect to make with the fix.
 - [13-autoscaling](13-autoscaling/README.md): metrics-server and the HorizontalPodAutoscaler
 
 - [14-troubleshooting](14-troubleshooting/README.md): symptom table and broken scenarios
+
+## Checking the YAML
+
+`python3 scripts/check_manifests.py` runs a text-level check over the manifests (apiVersion, kind,
+metadata.name, image tags). It skips `broken/` and `scenarios/` on purpose. It is not a validator.
+The only real validation available here is `kubectl kustomize` for lesson 11, which renders without a cluster.
