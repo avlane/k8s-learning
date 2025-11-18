@@ -59,3 +59,18 @@ HTTPRoute reports `Accepted: True` and `ResolvedRefs: True` for its parent.
   gives `503` from the controller and a warning in `kubectl describe ingress`.
 - **Testing by IP**: with host-based rules, `curl http://localhost/` without the Host header hits the default backend (404).
 - **Annotations are controller specific**: `nginx.ingress.kubernetes.io/rewrite-target` means nothing to another controller.
+
+## Heads-up: ingress-nginx is being retired
+
+In November 2025 the Kubernetes project announced that the **ingress-nginx** controller
+(`kubernetes/ingress-nginx`, the one installed above) is being retired: best-effort maintenance
+until March 2026, then no more releases, bug fixes or security fixes. Existing installs keep working, but
+it is a poor choice for anything new. This is separate from NGINX Inc.'s own ingress controller.
+
+What that means for these notes:
+
+- The `ingress.yaml` example still shows how Ingress objects work, which is the same for any controller.
+- For new setups the Gateway API section above is the direction the project points to, or another maintained ingress controller.
+- `nginx.ingress.kubernetes.io/*` annotations are specific to ingress-nginx and will not carry over.
+
+I have only read the announcement, so check the project's own notice for the exact timeline.
