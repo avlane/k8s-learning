@@ -30,9 +30,14 @@ Expected:
 - Scaling does not change the template, so it does not create a new ReplicaSet.
 - The change cause column in `rollout history` is empty unless you set the `kubernetes.io/change-cause` annotation.
 
-## Naive bits to fix later
+## What was added after the first version
 
-- No resource requests or limits, no probes, no securityContext.
+- Requests and a memory limit (no CPU limit on purpose, see lesson 13), plus readiness and liveness probes.
+  With the probes, `maxUnavailable: 0` now means something: a new Pod must pass its readiness probe before an old one goes.
+
+## Still naive
+
+- No securityContext: the official nginx image runs as root and listens on port 80.
 - The image tag is pinned but is bumped by hand.
 
 ## Mistakes and fixes
