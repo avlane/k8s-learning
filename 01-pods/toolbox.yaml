@@ -9,3 +9,16 @@ spec:
     - name: busybox
       image: busybox:1.37.0
       command: ["sleep", "3600"]
+      resources:
+        requests:
+          cpu: 10m
+          memory: 8Mi
+        limits:
+          cpu: 50m
+          memory: 32Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]

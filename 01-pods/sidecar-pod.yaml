@@ -13,6 +13,19 @@ spec:
       image: busybox:1.37.0
       restartPolicy: Always
       command: ["sh", "-c", "touch /logs/app.log; tail -F /logs/app.log"]
+      resources:
+        requests:
+          cpu: 10m
+          memory: 8Mi
+        limits:
+          cpu: 50m
+          memory: 32Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
       volumeMounts:
         - name: logs
           mountPath: /logs
@@ -20,6 +33,19 @@ spec:
     - name: app
       image: busybox:1.37.0
       command: ["sh", "-c", "while true; do date >> /logs/app.log; sleep 5; done"]
+      resources:
+        requests:
+          cpu: 10m
+          memory: 8Mi
+        limits:
+          cpu: 50m
+          memory: 32Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
       volumeMounts:
         - name: logs
           mountPath: /logs

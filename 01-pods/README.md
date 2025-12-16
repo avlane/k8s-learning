@@ -101,3 +101,16 @@ reasonably recent cluster.
 
 Expected: `kubectl get pod sidecar-demo` shows `2/2` once both are running,
 and the log-tailer prints a timestamp every five seconds.
+
+## Resources and securityContext
+
+The busybox helper Pods (`toolbox.yaml`, `sidecar-pod.yaml`) now set requests and limits and run as a
+non-root user with privilege escalation off and all capabilities dropped.
+
+- `runAsNonRoot: true` on its own is not enough for an image whose default user is root (busybox is): the kubelet refuses to
+  start it with `container has runAsNonRoot and image will run as root`, shown as `CreateContainerConfigError`. Setting
+  `runAsUser: 65534` (the `nobody` user) fixes that.
+- `drop: ["ALL"]` removes every Linux capability. That is fine for `sleep` and `tail` but would break something that
+  needs to bind a port below 1024 or change file ownership.
+- `pod.yaml` (the official nginx image) is deliberately left alone: it starts as root and needs to write to
+  `/var/cache/nginx`, so a strict securityContext would crash it. Lesson 02 deals with that.
