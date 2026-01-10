@@ -71,3 +71,11 @@ Setting `immutable: true` stops edits (and saves the kubelet from watching them)
 To change one you create a new object with a new name and point the workload at it.
 Appending a short content hash to the name is the usual pattern, and is what
 Kustomize's `configMapGenerator` does (lesson 11).
+
+## Hardening notes
+
+`pod-secret.yaml` now has limits and a non-root securityContext. `pod-config.yaml` only got requests and limits: it
+runs the stock nginx image, which needs root to start (see lesson 02).
+Environment variables from Secrets can leak through `kubectl describe`-style tooling, crash dumps and
+child processes. Mounting the Secret as a file (`volumes[].secret`) with `defaultMode: 0400` is the safer default
+when the app supports reading a file.
