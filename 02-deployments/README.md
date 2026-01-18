@@ -12,7 +12,7 @@ Files: `deployment.yaml`
     kubectl get deployment,replicaset,pods -l app=web
     kubectl delete pod -l app=web --wait=false      # watch them come back
     kubectl scale deployment web --replicas=5
-    kubectl set image deployment/web nginx=nginx:1.27.5
+    kubectl set image deployment/web nginx=nginxinc/nginx-unprivileged:1.29.0
     kubectl rollout status deployment/web
     kubectl rollout history deployment/web
     kubectl rollout undo deployment/web
@@ -35,9 +35,21 @@ Expected:
 - Requests and a memory limit (no CPU limit on purpose, see lesson 13), plus readiness and liveness probes.
   With the probes, `maxUnavailable: 0` now means something: a new Pod must pass its readiness probe before an old one goes.
 
+## Running as non-root
+
+The official `nginx` image starts as root, binds port 80 and writes to `/var/cache/nginx`, so dropping all capabilities
+or forcing `runAsNonRoot` on it would most likely crash it. The Deployment now uses `nginxinc/nginx-unprivileged`,
+which runs as an unprivileged user and listens on **8080**. Consequences:
+
+- The container port is now 8080, and the probes use the port *name* (`http`) so only one line mentions the number.
+- A Service in front of it must use `targetPort: 8080` (or `http`). See lesson 03.
+- `runAsNonRoot: true` works without `runAsUser` here because the image declares a numeric non-root USER.
+- `seccompProfile: RuntimeDefault` applies the container runtime's default syscall filter.
+
+`readOnlyRootFilesystem: true` probably needs `emptyDir` mounts for the paths nginx writes to.
+
 ## Still naive
 
-- No securityContext: the official nginx image runs as root and listens on port 80.
 - The image tag is pinned but is bumped by hand.
 
 ## Mistakes and fixes
