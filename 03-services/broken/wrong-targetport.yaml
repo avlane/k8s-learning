@@ -1,4 +1,4 @@
-# Deliberately broken: nginx listens on 80, not 8080.
+# Deliberately broken: the container listens on 8080 (named http), not 9090.
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,4 +8,4 @@ spec:
     app: web
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 9090

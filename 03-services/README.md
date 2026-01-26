@@ -25,7 +25,7 @@ Expected:
 
 - The EndpointSlice should list the three Pod IPs.
 - Inside the cluster `web` resolves from the same namespace, and `web.default.svc.cluster.local` resolves from anywhere.
-- `port` is what clients use on the Service, `targetPort` is the port the container listens on.
+- `port` is what clients use on the Service, `targetPort` is the port the container listens on. The Services here use `targetPort: http`, the *name* of the container port (8080 since lesson 02 switched to the unprivileged nginx image), which is the more robust form.
 
 ## Other Service types
 
@@ -51,10 +51,10 @@ Service selector with `kubectl get pods --show-labels`. This is the most common 
 
 ### Right Pods, wrong targetPort
 
-`broken/wrong-targetport.yaml`: endpoints exist (the Pods match) but they point at port 8080.
+`broken/wrong-targetport.yaml`: endpoints exist (the Pods match) but they point at port 9090.
 
-Expected: `kubectl get endpointslices` lists the Pod IPs with port 8080,
-and `wget http://web-wrong-port` fails with "connection refused", since nothing listens on 8080.
+Expected: `kubectl get endpointslices` lists the Pod IPs with port 9090,
+and `wget http://web-wrong-port` fails with "connection refused", since nothing listens on 9090.
 Fix `targetPort` to the container's real port, or give the container port a name and
 use the name in `targetPort` so that only the Pod spec needs to change.
 
@@ -62,3 +62,7 @@ use the name in `targetPort` so that only the Pod spec needs to change.
 
 If the readiness probe fails (lesson 05) the Pod is removed from the EndpointSlice
 but keeps running. A Service with zero ready Pods behaves like the no-selector case.
+### Forgetting a Service after changing the container port
+
+When lesson 02 moved nginx from port 80 to 8080, these Services kept `targetPort: 80` for a while and would have
+shown healthy endpoints that refuse connections. Using the port name avoids that class of bug.
