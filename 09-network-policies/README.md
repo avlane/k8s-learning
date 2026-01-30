@@ -28,5 +28,5 @@ a deny: a Pod is only isolated if some policy selects it, and then only the unio
 
 - **Nothing changes.** The CNI does not implement NetworkPolicy.
 - **`podSelector: {}`** selects *all* Pods in the namespace. `from: - podSelector` and `- namespaceSelector` as two list items mean OR; both keys inside one item mean AND. Indentation matters here.
-- Policies match the **Pod's** port (`containerPort`), not the Service port.
+- Policies match the **Pod's** port (`containerPort`), not the Service port. After lesson 02 moved nginx to 8080, this allow rule still said 80 and would have blocked everything it was meant to allow.
 - Only `Ingress` is denied so far. Egress policies come later, and they will break DNS if not planned for.
