@@ -4,6 +4,9 @@ metadata:
   name: web
   labels:
     app: web
+    app.kubernetes.io/name: web
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: k8s-learning
 spec:
   replicas: 3
   revisionHistoryLimit: 5
@@ -20,6 +23,9 @@ spec:
     metadata:
       labels:
         app: web
+        app.kubernetes.io/name: web
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: k8s-learning
     spec:
       securityContext:
         seccompProfile:

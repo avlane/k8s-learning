@@ -4,6 +4,8 @@ metadata:
   name: web
   labels:
     app: web
+    app.kubernetes.io/name: web
+    app.kubernetes.io/part-of: k8s-learning
 spec:
   selector:
     app: web

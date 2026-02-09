@@ -86,3 +86,10 @@ motivation for lesson 05.
 
 `revisionHistoryLimit: 5` keeps five old ReplicaSets for `rollout undo`. The
 default is 10, which clutters `kubectl get rs`.
+
+## Labels
+
+Besides `app: web` the Deployment and its Pods carry the recommended `app.kubernetes.io/*` labels
+(`name`, `component`, `part-of`), which tools such as dashboards and Helm look for.
+The **selector stays `app: web`**: `spec.selector` cannot be changed after creation, and a selector that includes
+labels the Pods do not all have would orphan them. Adding labels to the Pod template is safe, changing the selector is not.
