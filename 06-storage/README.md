@@ -75,3 +75,10 @@ but also leaks storage. `persistentVolumeClaimRetentionPolicy` (`whenDeleted` / 
 
 A non-root container may not be able to write to a freshly provisioned volume owned by root.
 `securityContext.fsGroup` on the Pod makes the kubelet adjust group ownership. This matters a lot for databases.
+
+## Why fsGroup is in the manifests now
+
+Once the writers run as UID 65534 instead of root, a new volume owned by root would refuse their writes
+(`Permission denied`). `fsGroup: 65534` on the Pod makes the kubelet set the group ownership of supported volumes
+(emptyDir, most dynamically provisioned PVCs) to that group and make them group-writable. Some storage types
+ignore `fsGroup`, and on large volumes the recursive ownership change slows Pod start. `fsGroupChangePolicy: OnRootMismatch` helps there.
