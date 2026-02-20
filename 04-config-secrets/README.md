@@ -4,7 +4,7 @@ Configuration lives outside the image. A ConfigMap holds non-secret key/value
 data; a Secret holds sensitive data. Both can be injected as environment
 variables or mounted as files.
 
-Files: `configmap.yaml`, `pod-config.yaml`
+Files: `configmap.yaml`, `pod-config.yaml`, `secret.example.yaml`, `pod-secret.yaml`
 
 ## Run it
 
@@ -29,8 +29,12 @@ and nginx serves the page from the ConfigMap.
 
 ## Secrets
 
-    kubectl apply -f secret.yaml
+    cp secret.example.yaml db-credentials.secret.yaml     # git-ignored; edit the values
+    kubectl apply -f db-credentials.secret.yaml
     kubectl apply -f pod-secret.yaml
+    # or, without a file on disk at all:
+    #   kubectl create secret generic db-credentials --from-literal=DB_USER=app --from-literal=DB_PASSWORD=...
+
     kubectl get secret db-credentials -o yaml
     kubectl get secret db-credentials -o jsonpath='{.data.DB_PASSWORD}' | base64 -d
     kubectl exec secret-demo -- env | grep DB_
@@ -40,8 +44,9 @@ Expected: the YAML shows the values base64-encoded under `data:`
 
 **base64 is encoding, not encryption.** Anyone who can read the Secret can decode it,
 and by default Secrets are stored unencrypted in etcd unless encryption at rest is
-configured. The password in `secret.yaml` is a placeholder, but committing a real
-one would be a leak. See the mistakes below.
+configured. Earlier versions of this lesson committed `secret.yaml` with a placeholder password. That was only
+harmless because the value was fake; a real one would live in git history forever. The file is replaced by
+`secret.example.yaml`, and `*.secret.yaml` is in `.gitignore`. For real clusters look at sealed-secrets, SOPS or an external secret store.
 
 ## Mistakes and fixes
 
