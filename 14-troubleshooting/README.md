@@ -58,3 +58,28 @@ The `scenarios/` folder has manifests that fail on purpose, one per symptom in t
 Lessons 01 to 06 have more (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Pending PVC).
 Apply one at a time with `kubectl apply -f scenarios/NAME.yaml`, work out the cause from
 `describe` and `logs` alone, then clean up with `kubectl delete -f`.
+
+## Debugging a container with no shell
+
+Minimal images (distroless, scratch-based) have no `sh`, so `kubectl exec -it ... -- sh` fails with
+`executable file not found`. An **ephemeral container** attaches a debug image to the running Pod:
+
+    kubectl debug -it POD --image=busybox:1.37.0 --target=CONTAINER
+    # inside: ps, ls /proc/1/root/ (the target's filesystem when process namespaces are shared), wget, nslookup
+    kubectl debug POD -it --copy-to=POD-debug --container=app --image=busybox:1.37.0 -- sh   # debug a copy, change the command
+
+Ephemeral containers cannot be removed from a Pod once added, and `--target` only shares the process
+namespace if the container runtime supports it. `kubectl debug node/NODE -it --image=busybox:1.37.0` starts a
+Pod on a node with the host filesystem mounted at `/host`.
+
+## Node problems
+
+    kubectl get nodes
+    kubectl describe node NODE            # Conditions: Ready, MemoryPressure, DiskPressure, PIDPressure
+    kubectl cordon NODE                   # stop new Pods landing there
+    kubectl drain NODE --ignore-daemonsets --delete-emptydir-data
+    kubectl uncordon NODE
+
+`NotReady` nodes usually mean the kubelet or the container runtime is down. Pods on them show `Terminating`
+or `Unknown` for a while (the default toleration window is 5 minutes) before they are rescheduled. On kind a node is a
+Docker container, so `docker restart learning-worker` is the equivalent of a reboot.
