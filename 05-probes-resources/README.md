@@ -73,3 +73,21 @@ and put dependency checks in readiness if anywhere.
 
 See the bug in the first version of `deployment-probes.yaml` above. A failing readiness
 probe shows up as `0/1 READY` with a Running status, and no endpoints for the Service.
+
+## Resizing a running Pod
+
+Historically changing a container's resources meant recreating the Pod. In-place Pod resize was alpha for a long
+time and became **beta (on by default) in Kubernetes 1.33**, with a `resize` subresource. `resize-demo.yaml` sets
+`resizePolicy`: CPU changes need no restart, memory changes restart the container.
+
+    kubectl apply -f resize-demo.yaml
+    kubectl patch pod resize-demo --subresource resize --patch \
+      '{"spec":{"containers":[{"name":"app","resources":{"requests":{"cpu":"200m"},"limits":{"cpu":"200m"}}}]}}'
+    kubectl get pod resize-demo -o jsonpath='{.status.containerStatuses[0].resources}'
+    kubectl get pod resize-demo -o jsonpath='{.status.containerStatuses[0].restartCount}'
+
+Expected: the status shows the new CPU values and `restartCount` stays `0`. Requests and limits
+must keep the same QoS class, and the node must have room for the larger request or the resize stays pending.
+
+**This needs a cluster running 1.33 or newer.** The kind config in `../00-setup` pins `kindest/node:v1.32.0`, where the
+feature is not on by default, so the example would need a newer node image.
