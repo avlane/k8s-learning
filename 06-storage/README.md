@@ -82,3 +82,14 @@ Once the writers run as UID 65534 instead of root, a new volume owned by root wo
 (`Permission denied`). `fsGroup: 65534` on the Pod makes the kubelet set the group ownership of supported volumes
 (emptyDir, most dynamically provisioned PVCs) to that group and make them group-writable. Some storage types
 ignore `fsGroup`, and on large volumes the recursive ownership change slows Pod start. `fsGroupChangePolicy: OnRootMismatch` helps there.
+
+## Retention policy and expanding a volume
+
+`persistentVolumeClaimRetentionPolicy` in `statefulset.yaml` spells out the default (`Retain` on delete and on scale
+down). Setting `whenDeleted: Delete` removes the PVCs together with the StatefulSet. That field went through alpha and
+beta before becoming stable, so check that your cluster version accepts it.
+
+To grow a PVC, edit `spec.resources.requests.storage` to a larger value. This works only when the StorageClass has
+`allowVolumeExpansion: true` and the driver supports it (`kubectl get storageclass -o yaml`). Shrinking is not possible.
+For a StatefulSet the `volumeClaimTemplates` are immutable, so you edit each PVC by hand and then recreate the
+StatefulSet with `kubectl delete statefulset store --cascade=orphan` so the Pods keep running.

@@ -17,6 +17,9 @@ metadata:
 spec:
   serviceName: store
   replicas: 2
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   selector:
     matchLabels:
       app: store
