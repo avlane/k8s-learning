@@ -93,3 +93,17 @@ Besides `app: web` the Deployment and its Pods carry the recommended `app.kubern
 (`name`, `component`, `part-of`), which tools such as dashboards and Helm look for.
 The **selector stays `app: web`**: `spec.selector` cannot be changed after creation, and a selector that includes
 labels the Pods do not all have would orphan them. Adding labels to the Pod template is safe, changing the selector is not.
+
+## Surviving voluntary disruptions
+
+`pdb.yaml` says at least 2 `app=web` Pods must stay available during *voluntary* disruptions such as `kubectl drain`.
+Eviction requests that would drop below 2 are refused until another Pod is ready, so a drain can appear to hang.
+It does nothing for crashes or node failures. `topologySpreadConstraints` asks the scheduler to spread the replicas
+across nodes (`ScheduleAnyway` makes it a preference, so a one-node cluster still schedules everything).
+
+    kubectl apply -f pdb.yaml
+    kubectl get pdb web
+    kubectl drain learning-worker --ignore-daemonsets --delete-emptydir-data
+
+Expected: `ALLOWED DISRUPTIONS` is 1 with three healthy replicas.
+A PDB with `minAvailable` equal to the replica count blocks every drain, which is the usual way this goes wrong.
