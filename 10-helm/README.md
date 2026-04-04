@@ -36,3 +36,16 @@ both labelled `app.kubernetes.io/instance: demo`. `helm history` shows one revis
 - **Whitespace trimming**: `{{-` removes whitespace before the tag, `-}}` after. Too much trimming glues lines together, too little leaves blank lines.
 - **Debugging**: `helm template --debug` prints the rendered output even when it is invalid YAML, which is the easiest way to find the broken line.
 - **Selectors are immutable**: do not put anything that changes per release (like the chart version) into `selectorLabels`.
+
+## Values schema
+
+`values.schema.json` makes Helm validate values on `install`, `upgrade`, `lint` and `template`. With it,
+`--set replicaCount=abc` or `--set service.type=Nodeport` fails before anything is rendered, instead of producing a
+Deployment the API server rejects later. It also turns the `tag: 1.27` float problem into an error, because
+`tag` must be a string.
+
+## Helm 4
+
+Helm 4 was released in November 2025. As far as I understand, charts with
+`apiVersion: v2` are still supported. Read the project's Helm 4 migration notes before upgrading a workflow, and run
+`helm lint` and `helm template` on the chart with whichever version you use.
