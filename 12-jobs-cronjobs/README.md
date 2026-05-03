@@ -44,4 +44,12 @@ The CronJob has no jobs until the next five-minute mark; `LAST SCHEDULE` shows w
 - `startingDeadlineSeconds` gives up on a run that could not start in time (for example the controller was down). If more than 100 runs are missed the CronJob stops scheduling; a deadline limits what counts.
 - `activeDeadlineSeconds` kills a Job that runs too long; `backoffLimit` caps retries.
 - `ttlSecondsAfterFinished` deletes finished Jobs (and their Pods) automatically.
-- The schedule is evaluated in the controller's time zone (usually UTC) unless `timeZone` is set.
+- `timeZone: "Etc/UTC"` pins the schedule's time zone. Without it the schedule follows the controller manager's zone (usually UTC, but not something to rely on). Use IANA names such as `Europe/Berlin`.
+
+## Pausing
+
+    kubectl patch cronjob heartbeat -p '{"spec":{"suspend":true}}'
+    kubectl patch cronjob heartbeat -p '{"spec":{"suspend":false}}'
+
+Suspending stops new runs; running Jobs continue. Runs that were due while suspended are not replayed
+(though one inside `startingDeadlineSeconds` may fire right after resuming).

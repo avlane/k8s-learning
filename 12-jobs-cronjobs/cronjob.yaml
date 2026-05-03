@@ -4,6 +4,7 @@ metadata:
   name: heartbeat
 spec:
   schedule: "*/5 * * * *"
+  timeZone: "Etc/UTC"
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 120
   successfulJobsHistoryLimit: 3
