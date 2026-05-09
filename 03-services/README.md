@@ -66,3 +66,11 @@ but keeps running. A Service with zero ready Pods behaves like the no-selector c
 
 When lesson 02 moved nginx from port 80 to 8080, these Services kept `targetPort: 80` for a while and would have
 shown healthy endpoints that refuse connections. Using the port name avoids that class of bug.
+
+## Endpoints versus EndpointSlices
+
+Older tutorials use `kubectl get endpoints web`. The core `v1` Endpoints API has been deprecated since
+Kubernetes 1.33 in favour of EndpointSlices (`discovery.k8s.io/v1`), and newer clusters may print a deprecation warning
+for it. A Service's Endpoints object also truncates at 1000 addresses while EndpointSlices split large sets into
+multiple objects (100 endpoints each by default). The commands in this lesson use `kubectl get endpointslices`.
+It is fine to read Endpoints for a quick look on a small cluster, but do not write new manifests against it.
