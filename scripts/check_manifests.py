@@ -3,7 +3,8 @@
 
 This only looks at the text: every
 document needs apiVersion, kind and metadata.name, no tabs, and images need a
-tag that is not "latest". It is not a YAML parser and it validates nothing
+tag that is not "latest". Workloads without limits or a securityContext get a note
+(not an error). It is not a YAML parser and it validates nothing
 against the Kubernetes API.
 
 usage: python3 scripts/check_manifests.py [directory]
@@ -42,8 +43,20 @@ def has_metadata_name(doc):
     return False
 
 
+WORKLOADS = {"Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"}
+
+
+def kind_of(doc):
+    for line in doc:
+        match = re.match(r"kind:\s*(\S+)", line)
+        if match:
+            return match.group(1)
+    return None
+
+
 def check_file(path):
     problems = []
+    notes = []
     text = path.read_text()
     if "\t" in text:
         problems.append("contains a tab character")
@@ -53,6 +66,12 @@ def check_file(path):
                 problems.append("document {}: missing {}".format(number, key))
         if not has_metadata_name(doc):
             problems.append("document {}: missing metadata.name".format(number))
+        if kind_of(doc) in WORKLOADS:
+            body = "\n".join(doc)
+            if "limits:" not in body:
+                notes.append("document {}: no resource limits".format(number))
+            if "securityContext:" not in body:
+                notes.append("document {}: no securityContext".format(number))
         for line in doc:
             match = re.match(r"\s*(?:- )?image:\s*(\S+)", line)
             if match:
@@ -62,7 +81,7 @@ def check_file(path):
                     problems.append("image {} has no tag".format(image))
                 elif image.endswith(":latest"):
                     problems.append("image {} uses :latest".format(image))
-    return problems
+    return problems, notes
 
 
 def main(argv):
@@ -74,9 +93,12 @@ def main(argv):
         if parts & SKIP_DIRS or path.name in SKIP_NAMES or "{{" in path.read_text():
             continue
         checked += 1
-        for problem in check_file(path):
+        problems, notes = check_file(path)
+        for problem in problems:
             failed += 1
             print("{}: {}".format(path, problem))
+        for note in notes:
+            print("{}: note: {}".format(path, note))
     print("checked {} files, {} problems".format(checked, failed))
     return 1 if failed else 0
 
