@@ -36,3 +36,19 @@ object saying the ServiceAccount "cannot list resource secrets".
 - **Empty string API group.** Core resources (pods, services, configmaps) use `apiGroups: [""]`. `deployments` is in `apps`.
 - **Wrong subject namespace.** A ServiceAccount subject needs `namespace:` and a typo here silently grants nothing.
 - Roles do not give access to subresources automatically: `pods/log` and `pods/exec` are separate resources.
+
+## One ClusterRole, bound per namespace
+
+`clusterrole-viewer.yaml` defines read-only access once; `rolebinding-viewer.yaml` is a **RoleBinding** to that
+ClusterRole, so the `viewer` ServiceAccount gets those verbs only in the binding's namespace. A ClusterRoleBinding
+would have granted them cluster-wide. Reuse the ClusterRole with a RoleBinding in each namespace that needs it.
+
+    kubectl apply -f clusterrole-viewer.yaml -f serviceaccount-viewer.yaml -f rolebinding-viewer.yaml
+    kubectl auth can-i list deployments.apps --as=system:serviceaccount:default:viewer                  # yes
+    kubectl auth can-i list pods -n kube-system --as=system:serviceaccount:default:viewer               # no
+    kubectl auth can-i create pods --as=system:serviceaccount:default:viewer                            # no
+
+Expected: `yes`, `no`, `no`.
+
+`no-api-access` sets `automountServiceAccountToken: false`. Most application Pods never call the API server, and
+without a mounted token a compromised container cannot use one. Pods can also opt out with the same field in their own spec.
