@@ -83,3 +83,14 @@ Pod on a node with the host filesystem mounted at `/host`.
 `NotReady` nodes usually mean the kubelet or the container runtime is down. Pods on them show `Terminating`
 or `Unknown` for a while (the default toleration window is 5 minutes) before they are rescheduled. On kind a node is a
 Docker container, so `docker restart learning-worker` is the equivalent of a reboot.
+
+## Permission, DNS and network symptoms
+
+- **`Error from server (Forbidden): ... cannot list resource "pods" in API group "" in the namespace "x"`**: the message
+  names the subject, verb, resource and namespace. Test with `kubectl auth can-i VERB RESOURCE --as=SUBJECT -n NS`
+  (lesson 08), then grant exactly that.
+- **`bad address 'web'` / `could not resolve host`**: DNS. From a throwaway Pod, `nslookup kubernetes.default`. If that
+  fails look at CoreDNS: `kubectl -n kube-system get pods -l k8s-app=kube-dns` and its logs. An egress NetworkPolicy without a DNS rule produces the same symptom (lesson 09).
+- **Timeout versus refused**: a NetworkPolicy drop looks like a *timeout*; nothing listening on the port looks like *connection refused*.
+- **Works by Pod IP, fails by Service name**: DNS or Service selector. **Works by Service name from one namespace but not another**: use the full `web.NAMESPACE.svc.cluster.local`.
+- **Works in `port-forward` but not through the Ingress**: look at the Ingress class, host header and the Service port (lesson 07).
