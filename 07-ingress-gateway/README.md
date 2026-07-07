@@ -39,7 +39,7 @@ split by who owns them:
 
 It is not built into Kubernetes: the CRDs are installed separately, and so is an implementation.
 
-    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
+    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
     kubectl get gatewayclass                         # pick a class and put its name into gateway.yaml
     kubectl apply -f gateway.yaml -f httproute.yaml
     kubectl get gateway,httproute
@@ -74,3 +74,6 @@ What that means for these notes:
 - `nginx.ingress.kubernetes.io/*` annotations are specific to ingress-nginx and will not carry over.
 
 I have only read the announcement, so check the project's own notice for the exact timeline.
+The first version of these notes used the v1.3.0 release of the Gateway API CRDs; v1.4.0 is the newer release I switched to.
+`Gateway` and `HTTPRoute` in `gateway.networking.k8s.io/v1` are the stable (standard channel) resources and the manifests did not need to change.
+The experimental channel has more kinds but its API may change. Whichever implementation you pick states which Gateway API versions it supports; match them.
