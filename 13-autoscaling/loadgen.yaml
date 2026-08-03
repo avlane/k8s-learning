@@ -7,3 +7,16 @@ spec:
     - name: busybox
       image: busybox:1.37.0
       command: ["sh", "-c", "while true; do wget -q -O- http://web-hpa > /dev/null; done"]
+      resources:
+        requests:
+          cpu: 50m
+          memory: 8Mi
+        limits:
+          cpu: 250m
+          memory: 32Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]

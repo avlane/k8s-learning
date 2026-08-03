@@ -36,3 +36,8 @@ The Deployment now requests `100m`, so 50% means 50m per Pod on average.
 - **CPU limit and throttling**: with a CPU *limit* set, a busy container is throttled instead of using more CPU, so utilization against the request can sit well above 100% and HPA over-scales. That is why this Deployment sets no CPU limit.
 - **`behavior`**: the example removes at most one Pod per minute and waits two minutes of stable low load, which avoids flapping.
 - The HPA does not scale a Deployment with replicas at 0.
+
+## Consistency pass
+
+The Deployment follows lesson 02 now (nginx-unprivileged on 8080, the Service uses the port name, non-root securityContext).
+The load generator gets a CPU limit of 250m on purpose: without one a busy `wget` loop can eat a whole node core and distort the experiment.
