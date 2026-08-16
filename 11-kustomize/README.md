@@ -17,12 +17,12 @@ Files: `base/`, `overlays/dev/`, `overlays/prod/`
 
 `kubectl kustomize` only renders, so it works without a cluster, and I have run it on these directories.
 `overlays/dev` should output the Service and Deployment named `dev-web` in namespace `dev` with 1 replica, and
-`overlays/prod` the same names unprefixed in namespace `prod` with 4 replicas and `nginx:1.27.5`.
+`overlays/prod` the same names unprefixed in namespace `prod` with 4 replicas and `nginxinc/nginx-unprivileged:1.29.1`.
 The output I got is recorded at the bottom of this file.
 
 Things I noticed:
 
-- The `images:` transformer matches on the image *name* (`nginx`) and changes only the tag here.
+- The `images:` transformer matches on the image *name* (`nginxinc/nginx-unprivileged`, including the registry path) and changes only the tag here. When the base image changed from `nginx` to the unprivileged one, the old `name: nginx` entry silently matched nothing; always re-render after changing images.
 - `namePrefix` also rewrites references (a Service name used by an Ingress, for example) when they are known fields.
 - `namespace:` sets the namespace on every resource but does not create the Namespace object.
 
@@ -54,7 +54,7 @@ metadata:
 spec:
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: http
   selector:
     app: web
 ---
@@ -77,10 +77,23 @@ spec:
         app: web
     spec:
       containers:
-      - image: nginx:1.27.4
+      - image: nginxinc/nginx-unprivileged:1.29.0
         name: nginx
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+          name: http
+        resources:
+          limits:
+            memory: 64Mi
+          requests:
+            cpu: 25m
+            memory: 32Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
 
 $ kubectl kustomize overlays/prod
 apiVersion: v1
@@ -101,7 +114,7 @@ metadata:
 spec:
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: http
   selector:
     app: web
 ---
@@ -124,10 +137,11 @@ spec:
         app: web
     spec:
       containers:
-      - image: nginx:1.27.5
+      - image: nginxinc/nginx-unprivileged:1.29.1
         name: nginx
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+          name: http
         resources:
           limits:
             cpu: 500m
@@ -135,5 +149,11 @@ spec:
           requests:
             cpu: 100m
             memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
 ```
 <!-- rendered:end -->

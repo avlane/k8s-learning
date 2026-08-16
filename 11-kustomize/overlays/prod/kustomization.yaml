@@ -7,8 +7,8 @@ replicas:
   - name: web
     count: 4
 images:
-  - name: nginx
-    newTag: 1.27.5
+  - name: nginxinc/nginx-unprivileged
+    newTag: 1.29.1
 patches:
   - path: resources-patch.yaml
 configMapGenerator:
