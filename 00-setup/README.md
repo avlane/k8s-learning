@@ -35,3 +35,21 @@ Expected:
     kubectl run x --image=IMAGE --dry-run=client -o yaml   # generate YAML instead of typing it
     kubectl get events --sort-by=.lastTimestamp
     kubectl config get-contexts          # which cluster am I talking to?
+
+## A namespace for the lessons
+
+Everything so far lands in `default`. `namespace.yaml` creates a `learning` namespace with Pod Security
+Admission labels:
+
+- `enforce: baseline` rejects the clearly dangerous things (privileged containers, host namespaces, `hostPath` volumes).
+- `warn` and `audit: restricted` do not block anything but print a warning when a Pod would not pass the stricter `restricted`
+  profile (non-root, no privilege escalation, dropped capabilities, seccomp profile).
+
+    kubectl apply -f namespace.yaml
+    kubectl config set-context --current --namespace=learning
+    kubectl apply -f ../01-pods/pod.yaml
+
+Expected: Pods that follow the hardening in these lessons apply silently; the lessons that still run
+the root nginx image should print a `would violate PodSecurity "restricted:latest"` warning that lists the failing fields.
+The `broken/` examples are plain Pods and are not meant to be hardened. Some manifests (the kustomize overlays) set
+their own namespaces, so check `kubectl config view --minify` before wondering where something went.
