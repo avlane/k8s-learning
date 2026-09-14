@@ -13,7 +13,7 @@ Files: `pod.yaml`, `toolbox.yaml` (a busybox Pod to run commands from inside the
     kubectl get pods -o wide
     kubectl describe pod hello-nginx
     kubectl logs hello-nginx
-    kubectl port-forward pod/hello-nginx 8080:80      # then, in another terminal: curl -i localhost:8080
+    kubectl port-forward pod/hello-nginx 8080:8080    # then, in another terminal: curl -i localhost:8080
     kubectl exec -it hello-nginx -- sh
     kubectl delete -f pod.yaml
 
@@ -33,11 +33,12 @@ Expected:
 - Deleting a bare Pod is final. Nothing recreates it.
 - `curl` through the port-forward should return the nginx welcome page with `HTTP/1.1 200 OK`.
 
-## Naive bits to fix later
+## History
 
-- No resource requests or limits.
-- No `securityContext`, so nginx runs as root.
-- It lives in the `default` namespace.
+The first version used the stock `nginx` image on port 80 with no resources and no `securityContext`.
+It now uses `nginxinc/nginx-unprivileged` (port 8080, non-root) with requests, a memory limit and a restricted
+securityContext, the same pattern as lesson 02. It still lives in the `default` namespace unless you switch
+to `learning` (lesson 00).
 
 ## Talking to the Pod from another Pod
 
@@ -112,5 +113,5 @@ non-root user with privilege escalation off and all capabilities dropped.
   `runAsUser: 65534` (the `nobody` user) fixes that.
 - `drop: ["ALL"]` removes every Linux capability. That is fine for `sleep` and `tail` but would break something that
   needs to bind a port below 1024 or change file ownership.
-- `pod.yaml` (the official nginx image) is deliberately left alone: it starts as root and needs to write to
-  `/var/cache/nginx`, so a strict securityContext would crash it. Lesson 02 deals with that.
+- `pod.yaml` was left alone at that point because the official nginx image starts as root and needs to write to
+  `/var/cache/nginx`, so a strict securityContext would most likely crash it. It was later switched to the unprivileged image.
