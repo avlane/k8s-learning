@@ -39,5 +39,7 @@ list of mistakes I expect to make with the fix.
 ## Checking the YAML
 
 `python3 scripts/check_manifests.py` runs a text-level check over the manifests (apiVersion, kind,
-metadata.name, image tags). It skips `broken/` and `scenarios/` on purpose. It is not a validator.
-The only real validation available here is `kubectl kustomize` for lesson 11, which renders without a cluster.
+metadata.name, image tags) and prints notes for workloads without limits or a securityContext. It skips `broken/` and
+`scenarios/` on purpose, plus Helm templates. It is not a validator.
+
+`kubectl apply --dry-run=client` does not help for this: it still asks a cluster's discovery endpoint which resource types exist.
